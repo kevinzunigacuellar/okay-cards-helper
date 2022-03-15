@@ -1,56 +1,60 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+
+const INITIAL_SOLUTION: [number, number, number][] = [
+  [6, 7, 8],
+  [5, 6, 7],
+  [4, 5, 6],
+  [3, 4, 5],
+  [2, 3, 4],
+  [1, 2, 3],
+]
+
+const INITIAL_DECK: number[] = [1, 2, 3, 4, 5, 6, 7, 8]
 
 export default function Home() {
+  const [cards, setCards] = useState(INITIAL_DECK)
+  const [solution, setSolution] = useState<[number, number, number][]>(INITIAL_SOLUTION)
+
+  useEffect(() => {
+    const updatedSolution = INITIAL_SOLUTION.filter(a => {
+      for (let i = 0; i < a.length; i++) {
+        if (!cards.includes(a[i])) {
+          return false
+        }
+      }
+      return true
+    })
+    setSolution(updatedSolution)
+  }, [cards])
   return (
     <div>
       <h1 className="text-5xl text-center font-semibold">Okay card helper</h1>
       <div className="flex">
-        <Card color="red" number={1} />
-        <Card color="red" number={2} />
-        <Card color="red" number={3} />
-        <Card color="red" number={4} />
-        <Card color="red" number={5} />
-        <Card color="red" number={6} />
-        <Card color="red" number={7} />
-        <Card color="red" number={8} />
+        {INITIAL_DECK.map(card => (
+          <Card color="blue" number={card} key={card} setCards={setCards} cards={cards} />
+        ))}
       </div>
-      <div className="flex">
-        <Card color="blue" number={1} />
-        <Card color="blue" number={2} />
-        <Card color="blue" number={3} />
-        <Card color="blue" number={4} />
-        <Card color="blue" number={5} />
-        <Card color="blue" number={6} />
-        <Card color="blue" number={7} />
-        <Card color="blue" number={8} />
-      </div>
-      <div className="flex">
-        <Card color="yellow" number={1} />
-        <Card color="yellow" number={2} />
-        <Card color="yellow" number={3} />
-        <Card color="yellow" number={4} />
-        <Card color="yellow" number={5} />
-        <Card color="yellow" number={6} />
-        <Card color="yellow" number={7} />
-        <Card color="yellow" number={8} />
-      </div>
+      <code>{JSON.stringify(solution, null, 2)}</code>
     </div>
   )
 }
 interface CardProps {
   color: 'red' | 'blue' | 'yellow'
   number: number
+  setCards: (cards: number[]) => void
+  cards: number[]
 }
 
-function Card({ color, number }: CardProps) {
-  const [inactive, setInactive] = useState(false)
-
+function Card({ color, number, setCards, cards }: CardProps) {
+  const [isActive, setIsActive] = useState(true)
   const handleClick = () => {
-    setInactive(prevState => !prevState)
+    if (isActive) {
+      setCards(cards.filter(card => card !== number))
+    } else {
+      setCards([...cards, number])
+    }
+    setIsActive(!isActive)
   }
-
-  const ab = inactive && 'bg-gray-300'
-
   const colors = {
     red: 'bg-red-500',
     blue: 'bg-blue-500',
@@ -58,7 +62,11 @@ function Card({ color, number }: CardProps) {
   }
   return (
     <button
-      className={`${colors[color]} border border-gray-800 w-20 h-20 flex justify-center items-center ${ab}`}
+      className={`${
+        colors[color]
+      } border border-gray-800 w-20 h-20 flex justify-center items-center ${
+        !isActive ? 'bg-gray-400' : ''
+      }`}
       onClick={handleClick}
     >
       {number}
