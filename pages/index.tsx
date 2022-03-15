@@ -1,40 +1,44 @@
-import { useState, useEffect } from 'react'
-
-const INITIAL_SOLUTION: [number, number, number][] = [
-  [6, 7, 8],
-  [5, 6, 7],
-  [4, 5, 6],
-  [3, 4, 5],
-  [2, 3, 4],
-  [1, 2, 3],
-]
+import { useState } from 'react'
+import useDeck from 'hooks/useDeck'
 
 const INITIAL_DECK: number[] = [1, 2, 3, 4, 5, 6, 7, 8]
 
 export default function Home() {
-  const [cards, setCards] = useState(INITIAL_DECK)
-  const [solution, setSolution] = useState<[number, number, number][]>(INITIAL_SOLUTION)
+  const { cards: blueCards, setCards: setBlueDeck, solution: blueSolution } = useDeck(INITIAL_DECK)
+  const { cards: redCards, setCards: setRedDeck, solution: redSolution } = useDeck(INITIAL_DECK)
+  const {
+    cards: yellowCards,
+    setCards: setYellowDeck,
+    solution: yellowSolution,
+  } = useDeck(INITIAL_DECK)
 
-  useEffect(() => {
-    const updatedSolution = INITIAL_SOLUTION.filter(a => {
-      for (let i = 0; i < a.length; i++) {
-        if (!cards.includes(a[i])) {
-          return false
-        }
-      }
-      return true
-    })
-    setSolution(updatedSolution)
-  }, [cards])
   return (
     <div>
-      <h1 className="text-5xl text-center font-semibold">Okay card helper</h1>
-      <div className="flex">
+      <h1 className="text-5xl text-center font-semibold my-8">Okay card helper</h1>
+      <div className="flex justify-center">
         {INITIAL_DECK.map(card => (
-          <Card color="blue" number={card} key={card} setCards={setCards} cards={cards} />
+          <Card color="blue" number={card} key={card} setCards={setBlueDeck} cards={blueCards} />
         ))}
       </div>
-      <code>{JSON.stringify(solution, null, 2)}</code>
+      <code>{JSON.stringify(blueSolution, null, 2)}</code>
+      <div className="flex justify-center">
+        {INITIAL_DECK.map(card => (
+          <Card color="red" number={card} key={card} setCards={setRedDeck} cards={redCards} />
+        ))}
+      </div>
+      <code>{JSON.stringify(redSolution, null, 2)}</code>
+      <div className="flex justify-center">
+        {INITIAL_DECK.map(card => (
+          <Card
+            color="yellow"
+            number={card}
+            key={card}
+            setCards={setYellowDeck}
+            cards={yellowCards}
+          />
+        ))}
+      </div>
+      <code>{JSON.stringify(yellowSolution, null, 2)}</code>
     </div>
   )
 }
